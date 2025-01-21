@@ -66,8 +66,13 @@ string solution_path(string &forth) {
 
 
     int len = forth.length();
-    Point p = path.back();
+    Point p = len > 0 ? path.back() : Point(0,0);
     int running_x = p.x, running_y = p.y;
+
+    // if start and end at the same location, no more moving required
+    if (x == 0 && y == 0) {
+    	return result;
+    }
 
     for (int i = forth.size()-1; i >= 0; i--)  {
     	bool move = false;
