@@ -3,6 +3,7 @@
 
 using namespace std;
 
+
 struct Point {
 	Point(int x, int y) {
 		this->x = x;
@@ -13,31 +14,6 @@ struct Point {
 	int y;
 };
 
-
-vector<Point> build_graph(string &forth) {
-	int x = 0, y = 0 ;
-	vector<Point> path;
-
-    for (char c : forth) {
-        switch (c) {
-        case 'N':
-        	y++;
-            break;
-        case 'S':
-        	y--;
-            break;
-        case 'E':
-        	x++;
-            break;
-        case 'W':
-        	x--;
-            break;
-        }
-
-    	path.emplace(path.end(), x, y);
-    }
-    return path;
-}
 
 bool hasIntersect(Point newPoint , vector<Point> path, vector<Point> return_path) {
 
@@ -58,21 +34,40 @@ bool hasIntersect(Point newPoint , vector<Point> path, vector<Point> return_path
 
 string solution_path(string &forth) {
     string result;
-    int x_min = INT_MAX, x_max = INT_MIN;
-    int y_min = INT_MAX, y_max = INT_MIN;
 	int x = 0, y = 0 ;
-	vector<Point> path = build_graph(forth);
+	vector<Point> path;
 	vector<Point> return_path;
+
+    for (char c : forth) {
+        switch (c) {
+        case 'N':
+        	y++;
+            break;
+        case 'S':
+        	y--;
+            break;
+        case 'E':
+        	x++;
+            break;
+        case 'W':
+        	x--;
+            break;
+        }
+
+    	path.emplace(path.end(), x, y);
+    }
 
 
     int len = forth.length();
     Point p = len > 0 ? path.back() : Point(0,0);
     int running_x = p.x, running_y = p.y;
 
-    // if start and end at the same location, no more moving required
+
+    // stand and end is the same, no moving
     if (x == 0 && y == 0) {
     	return result;
     }
+
 
     for (int i = forth.size()-1; i >= 0; i--)  {
     	bool move = false;
@@ -147,7 +142,6 @@ string solution_path(string &forth) {
         	return_path.emplace(return_path.end(), running_x, running_y);
         }
 
-
         // we back to start point
         if ( running_x == 0 &&  running_y == 0 ) {
         	return result;
@@ -155,111 +149,98 @@ string solution_path(string &forth) {
 
     }
 
-    if ( (result.back() != 'E' && hasIntersect(Point(running_x-1, running_y), path, return_path) == false )
-    		|| (result.back() != 'W' && hasIntersect(Point(running_x+1, running_y), path, return_path) == false) ) {
 
     // end point
-        // end point
-        if (running_x <= 0 && running_y <= 0) {
-        	if (hasIntersect(Point(running_x+1, running_y), path, return_path) == false) {
+    if (running_x <= 0 && running_y <= 0) {
+    	if (hasIntersect(Point(running_x+1, running_y), path, return_path) == false) {
+    		result.append("E");
+    		running_x++;
+    		return_path.emplace(return_path.end(), running_x, running_y);
+    		if (hasIntersect(Point(running_x, running_y+1), path, return_path) == false) {
+    		    result.append("N");
+    		    running_y++;
+    		    return_path.emplace(return_path.end(), running_x, running_y);
+    		}
+    	}
+    	else if (hasIntersect(Point(running_x, running_y+1), path, return_path) == false) {
+    		result.append("N");
+    		running_y++;
+    		return_path.emplace(return_path.end(), running_x, running_y);
+    		if (hasIntersect(Point(running_x+1, running_y), path, return_path) == false) {
         		result.append("E");
         		running_x++;
         		return_path.emplace(return_path.end(), running_x, running_y);
-        		if (hasIntersect(Point(running_x, running_y+1), path, return_path) == false) {
-        		    result.append("N");
-        		    running_y++;
-        		    return_path.emplace(return_path.end(), running_x, running_y);
-        		}
-        	}
-        	else if (hasIntersect(Point(running_x, running_y+1), path, return_path) == false) {
-        		result.append("N");
-        		running_y++;
-        		return_path.emplace(return_path.end(), running_x, running_y);
-        		if (hasIntersect(Point(running_x+1, running_y), path, return_path) == false) {
-            		result.append("E");
-            		running_x++;
-            		return_path.emplace(return_path.end(), running_x, running_y);
-        		}
-        	}
-        }
+    		}
+    	}
+    }
 
-        else if (running_x <= 0 && running_y >= 0) {
-        	if (hasIntersect(Point(running_x+1, running_y), path, return_path) == false) {
+    else if (running_x <= 0 && running_y >= 0) {
+    	if (hasIntersect(Point(running_x+1, running_y), path, return_path) == false) {
+    		result.append("E");
+    		running_x++;
+    		return_path.emplace(return_path.end(), running_x, running_y);
+    		if (hasIntersect(Point(running_x, running_y-1), path, return_path) == false) {
+    		    result.append("S");
+    		    running_y--;
+    		    return_path.emplace(return_path.end(), running_x, running_y);
+    		}
+    	}
+    	else if (hasIntersect(Point(running_x, running_y-1), path, return_path) == false) {
+    		result.append("S");
+    		running_y--;
+    		return_path.emplace(return_path.end(), running_x, running_y);
+    		if (hasIntersect(Point(running_x+1, running_y), path, return_path) == false) {
         		result.append("E");
         		running_x++;
         		return_path.emplace(return_path.end(), running_x, running_y);
-        		if (hasIntersect(Point(running_x, running_y-1), path, return_path) == false) {
-        		    result.append("S");
-        		    running_y--;
-        		    return_path.emplace(return_path.end(), running_x, running_y);
-        		}
-        	}
-        	else if (hasIntersect(Point(running_x, running_y-1), path, return_path) == false) {
-        		result.append("S");
-        		running_y--;
-        		return_path.emplace(return_path.end(), running_x, running_y);
-        		if (hasIntersect(Point(running_x+1, running_y), path, return_path) == false) {
-            		result.append("E");
-            		running_x++;
-            		return_path.emplace(return_path.end(), running_x, running_y);
-        		}
-        	}
-        }
-        else if (running_x >= 0 && running_y <= 0) {
-        	if (hasIntersect(Point(running_x-1, running_y), path, return_path) == false) {
-        		result.append("W");
+    		}
+    	}
+    }
+    else if (running_x >= 0 && running_y <= 0) {
+    	if (hasIntersect(Point(running_x-1, running_y), path, return_path) == false) {
+    		result.append("W");
+    		running_x--;
+    		return_path.emplace(return_path.end(), running_x, running_y);
+    		if (hasIntersect(Point(running_x, running_y+1), path, return_path) == false) {
+    		    result.append("N");
+    		    running_y++;
+    		    return_path.emplace(return_path.end(), running_x, running_y);
+    		}
+    	}
+    	else if (hasIntersect(Point(running_x, running_y+1), path, return_path) == false) {
+    		result.append("N");
+    		running_y++;
+    		return_path.emplace(return_path.end(), running_x, running_y);
+    		if (hasIntersect(Point(running_x-1, running_y), path, return_path) == false) {
+        		result.append("E");
         		running_x--;
         		return_path.emplace(return_path.end(), running_x, running_y);
-        		if (hasIntersect(Point(running_x, running_y+1), path, return_path) == false) {
-        		    result.append("N");
-        		    running_y++;
-        		    return_path.emplace(return_path.end(), running_x, running_y);
-        		}
-        	}
-        	else if (hasIntersect(Point(running_x, running_y+1), path, return_path) == false) {
-        		result.append("N");
-        		running_y++;
-        		return_path.emplace(return_path.end(), running_x, running_y);
-        		if (hasIntersect(Point(running_x-1, running_y), path, return_path) == false) {
-            		result.append("E");
-            		running_x--;
-            		return_path.emplace(return_path.end(), running_x, running_y);
-        		}
-        	}
-        }
-        else if (running_x >= 0 && running_y >= 0) {
-        	if (hasIntersect(Point(running_x-1, running_y), path, return_path) == false) {
+    		}
+    	}
+    }
+    else if (running_x >= 0 && running_y >= 0) {
+    	if (hasIntersect(Point(running_x-1, running_y), path, return_path) == false) {
+    		result.append("W");
+    		running_x--;
+    		return_path.emplace(return_path.end(), running_x, running_y);
+    		if (hasIntersect(Point(running_x, running_y-1), path, return_path) == false) {
+    		    result.append("S");
+    		    running_y--;
+    		    return_path.emplace(return_path.end(), running_x, running_y);
+    		}
+    	}
+    	else if (hasIntersect(Point(running_x, running_y-1), path, return_path) == false) {
+    		result.append("S");
+    		running_y--;
+    		return_path.emplace(return_path.end(), running_x, running_y);
+    		if (hasIntersect(Point(running_x-1, running_y), path, return_path) == false) {
         		result.append("W");
-        		running_x--;
+        		running_x++;
         		return_path.emplace(return_path.end(), running_x, running_y);
-        		if (hasIntersect(Point(running_x, running_y-1), path, return_path) == false) {
-        		    result.append("S");
-        		    running_y--;
-        		    return_path.emplace(return_path.end(), running_x, running_y);
-        		}
-        	}
-        	else if (hasIntersect(Point(running_x, running_y-1), path, return_path) == false) {
-        		result.append("S");
-        		running_y--;
-        		return_path.emplace(return_path.end(), running_x, running_y);
-        		if (hasIntersect(Point(running_x-1, running_y), path, return_path) == false) {
-            		result.append("W");
-            		running_x++;
-            		return_path.emplace(return_path.end(), running_x, running_y);
-        		}
-        	}
-        }
-
-
+    		}
+    	}
+    }
 
     return result;
 
 }
-
-
-int main()
-{
-return 1;
-}
-
-
